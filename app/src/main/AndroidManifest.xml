@@ -13,18 +13,14 @@
         android:theme="@style/Theme.Java_proje"
         tools:targetApi="31">
         <activity
-            android:name=".RegisterScreen"
-            android:exported="false" />
-        <activity
-            android:name=".deneme"
-            android:exported="false" />
-        <activity
             android:name=".HomePage"
-            android:exported="false"
-            android:label="@string/title_activity_home_pafe" />
+            android:exported="false" />
+        <activity
+            android:name=".RegisterScreen"
+            android:exported="true" />
         <activity
             android:name=".LoginScreen"
-            android:exported="false" />
+            android:exported="true" />
         <activity
             android:name=".MainActivity"
             android:exported="true">

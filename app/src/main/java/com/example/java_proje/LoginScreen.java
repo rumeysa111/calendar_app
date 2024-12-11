@@ -66,8 +66,8 @@ public class LoginScreen extends AppCompatActivity {
                         Toast.makeText(this, "Giriş başarılı!", Toast.LENGTH_SHORT).show();
 
                         // Burada giriş yapan kullanıcıyı yönlendirebilirsiniz
-                       // Intent intent = new Intent(LoginScreen.this, HomePage.class);
-                       // startActivity(intent);
+                        Intent intent = new Intent(LoginScreen.this, HomePage.class);
+                        startActivity(intent);
                         finish();
                     }
                 })
