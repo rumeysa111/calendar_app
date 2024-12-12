@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -75,11 +76,13 @@ public class TeamsFragment extends Fragment {
         dialog.setContentView(R.layout.dialog_add_user);
         dialog.setCancelable(true);
 
+
         // Get references to the EditText and Button inside the dialog
         EditText etUsername = dialog.findViewById(R.id.etUsername);
         EditText etPassword = dialog.findViewById(R.id.etPassword);
         EditText etRole = dialog.findViewById(R.id.etRole);
-        Button btnAdd = dialog.findViewById(R.id.btnSaveUser);  // Correct the button ID to match the one in the layout
+        Button btnAdd = dialog.findViewById(R.id.btnSave2User);  // Correct the button ID to match the one in the layout
+        CheckBox cbCanCreateMeeting=dialog.findViewById(R.id.cbMeetingPermission);
 
         btnAdd.setOnClickListener(view -> {
             String username = etUsername.getText().toString().trim();
@@ -91,7 +94,7 @@ public class TeamsFragment extends Fragment {
                 Toast.makeText(getContext(), "Lütfen tüm alanları doldurun!", Toast.LENGTH_SHORT).show();
             } else {
                 if (!teamList.isEmpty()) { // If there is a valid team
-                    addUserToTeam(teamList.get(0), username, password, role);
+                    addUserToTeam(teamList.get(0), username, password, role,cbCanCreateMeeting.isChecked());
                     dialog.dismiss();
                 } else {
                     Toast.makeText(getContext(), "Geçerli bir takım bulunamadı", Toast.LENGTH_SHORT).show();
@@ -112,17 +115,20 @@ public class TeamsFragment extends Fragment {
         EditText etTeamName = dialog.findViewById(R.id.etTeamName);
         EditText etTeamDescription = dialog.findViewById(R.id.etTeamDescription);
         Button btnSaveTeam = dialog.findViewById(R.id.btnSaveTeam);
+        CheckBox cbCanCreateMeeting=dialog.findViewById(R.id.cbMeetingPermission);
+
 
         // Button click for saving team
         btnSaveTeam.setOnClickListener(view -> {
             String teamName = etTeamName.getText().toString().trim();
             String teamDescription = etTeamDescription.getText().toString().trim();
+        //    boolean canCreateMeeting = cbCanCreateMeeting.isChecked();
 
             if (teamName.isEmpty() || teamDescription.isEmpty()) {
-                Toast.makeText(getContext(), "Lütfen tüm alanları doldurun!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(requireContext(), "Lütfen tüm alanları doldurun!", Toast.LENGTH_SHORT).show();
             } else {
                 addTeams(teamName, teamDescription);
-                Toast.makeText(getContext(), "Ekip oluşturuldu: " + teamName, Toast.LENGTH_SHORT).show();
+                Toast.makeText(requireContext(), "Ekip oluşturuldu: " + teamName, Toast.LENGTH_SHORT).show();
                 dialog.dismiss();
             }
         });
@@ -133,28 +139,36 @@ public class TeamsFragment extends Fragment {
     // Add team to Firestore
     private void addTeams(String teamName, String teamDescription) {
         SharedPreferences sharedPreferences = getContext().getSharedPreferences("user_prefs", getContext().MODE_PRIVATE);
-        String userId = sharedPreferences.getString("userId", null);
-
-        if (userId != null) {
+    //    String userId = sharedPreferences.getString("userId", null);
+         String adminId = sharedPreferences.getString("adminId", null);
+        if (adminId != null) {
             Map<String, Object> team = new HashMap<>();
             team.put("teamName", teamName);
             team.put("teamDescription", teamDescription);
-            team.put("userId", userId);
+          //  team.put("userId", userId);
+            team.put("adminId", adminId);
 
             db.collection("teams").add(team)
                     .addOnSuccessListener(documentReference -> {
-                        Toast.makeText(getContext(), "Ekip oluşturuldu: " + teamName, Toast.LENGTH_SHORT).show();
+                        Toast.makeText(requireContext(), "Ekip oluşturuldu: " + teamName, Toast.LENGTH_SHORT).show();
                         fetchTeams();  // Fetch teams again after creating the team
                     })
                     .addOnFailureListener(e -> Toast.makeText(getContext(), "Ekip oluşturulamadı.", Toast.LENGTH_SHORT).show());
         } else {
-            Toast.makeText(getContext(), "Kullanıcı ID bulunamadı.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(requireContext(), "Kullanıcı ID bulunamadı.", Toast.LENGTH_SHORT).show();
         }
     }
 
     // Fetch teams from Firestore
     private void fetchTeams() {
+        SharedPreferences sharedPreferences=getContext().getSharedPreferences("user_prefs",getContext().MODE_PRIVATE);
+        String adminId=sharedPreferences.getString("adminId",null);
+        if(adminId==null){
+            Toast.makeText(getContext(),"Admin Id bulunamadı",Toast.LENGTH_SHORT).show();
+            return;
+        }
         db.collection("teams")
+                .whereEqualTo("adminId",adminId)
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
                     teamList.clear();
@@ -169,12 +183,17 @@ public class TeamsFragment extends Fragment {
     }
 
     // Add user to team in Firestore
-    private void addUserToTeam(Team team, String username, String password, String role) {
+    private void addUserToTeam(Team team, String username, String password, String role,boolean canCreateMeeting) {
+        SharedPreferences sharedPreferences = getContext().getSharedPreferences("user_prefs", getContext().MODE_PRIVATE);
+        String adminId = sharedPreferences.getString("adminId", null);
+
         Map<String, Object> user = new HashMap<>();
         user.put("username", username);
         user.put("password", password);
         user.put("role", role);
         user.put("teamId", team.getId());
+        user.put("adminId",adminId);
+        user.put("canCreateMeeting", canCreateMeeting); // Add the permission
 
         db.collection("users").add(user)
                 .addOnSuccessListener(documentReference -> {

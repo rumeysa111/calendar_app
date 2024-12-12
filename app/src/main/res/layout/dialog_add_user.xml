@@ -26,9 +26,29 @@
         android:hint="Rol"
         android:inputType="text" />
 
-    <Button
-        android:id="@+id/btnSaveUser"
+    <!-- Yetki Seçenekleri Başlığı -->
+    <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Kaydet" />
+        android:text="Yetkiler:"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:layout_marginTop="16dp" />
+
+    <!-- Toplantı Düzenleme Yetkisi -->
+    <CheckBox
+        android:id="@+id/cbMeetingPermission"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Toplantı düzenleme yetkisi"
+        android:layout_marginTop="8dp" />
+
+
+
+    <Button
+        android:id="@+id/btnSave2User"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Kaydet"
+        android:layout_marginTop="16dp" />
 </LinearLayout>

@@ -2,8 +2,10 @@ package com.example.java_proje;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -43,11 +45,17 @@ public class RegisterScreen extends AppCompatActivity {
         // Kayıt ol butonunu buluyoruz
         Button registerButton = findViewById(R.id.register_button);
 
-        Button loginButton=findViewById(R.id.login_button);
-        loginButton.setOnClickListener(view -> {
-            Intent intent=new Intent(RegisterScreen.this,LoginScreen.class);
-            startActivity(intent);
+        TextView loginText = findViewById(R.id.login_text);
+
+        loginText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Giriş yap ekranına geçiş yap
+                Intent intent = new Intent(RegisterScreen.this, LoginScreen.class);
+                startActivity(intent);
+            }
         });
+
 
         // Kayıt ol butonuna tıklama olayını ekliyoruz
         registerButton.setOnClickListener(view -> {

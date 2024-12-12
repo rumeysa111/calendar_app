@@ -5,7 +5,8 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".LoginScreen">
+    tools:context=".LoginScreen"
+    android:background="@color/background_color">
 
     <!-- Kullanıcı Adı EditText -->
     <EditText
@@ -16,6 +17,9 @@
         android:hint="Kullanıcı Adı"
         android:padding="16dp"
         android:inputType="text"
+        android:textColor="@color/black"
+        android:textColorHint="@color/gray"
+        android:background="@drawable/rounded_edittext"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -29,6 +33,9 @@
         android:hint="Şifre"
         android:padding="16dp"
         android:inputType="textPassword"
+        android:textColor="@color/black"
+        android:textColorHint="@color/gray"
+        android:background="@drawable/rounded_edittext"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/username_edit" />
@@ -36,11 +43,16 @@
     <!-- Giriş Yap Butonu -->
     <Button
         android:id="@+id/login_button"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:text="Giriş Yap"
+        android:textColor="@android:color/white"
+        android:textSize="16sp"
         android:layout_marginTop="32dp"
+        android:background="@drawable/rounded_button"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/password_edit" />
+        app:layout_constraintTop_toBottomOf="@id/password_edit"
+        android:padding="14dp"/>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

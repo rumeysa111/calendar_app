@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <color name="button_background">#4CAF50</color> <!-- Buton için yeşil arka plan -->
+    <color name="background_color">#F5F5F5</color> <!-- Arka plan rengi -->
+    <color name="gray">#A9A9A9</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
 </resources>
