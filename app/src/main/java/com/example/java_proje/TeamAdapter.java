@@ -14,6 +14,7 @@ import java.util.ArrayList;
 public class TeamAdapter extends RecyclerView.Adapter<TeamAdapter.TeamViewHolder> {
 
     private ArrayList<Team> teamList;
+    private OnAddUserClickListener onAddUserClickListener;
 
     public TeamAdapter(ArrayList<Team> teamList) {
         this.teamList = teamList;
@@ -41,7 +42,6 @@ public class TeamAdapter extends RecyclerView.Adapter<TeamAdapter.TeamViewHolder
             }
         });
     }
-    private OnAddUserClickListener onAddUserClickListener;
 
     public void setOnAddUserClickListener(OnAddUserClickListener listener) {
         this.onAddUserClickListener = listener;
@@ -61,7 +61,7 @@ public class TeamAdapter extends RecyclerView.Adapter<TeamAdapter.TeamViewHolder
         TextView teamName;
 
         Button btnAddUser;
-        public TeamViewHolder(@NonNull View itemView) {
+        public TeamViewHolder( View itemView) {
             super(itemView);
             teamName = itemView.findViewById(R.id.teamNameTextView); // item_team.xml içinde tanımlanan TextView ID'si
             btnAddUser = itemView.findViewById(R.id.btnAddUser); // item_team.xml içinde tanımlanan Button ID'si

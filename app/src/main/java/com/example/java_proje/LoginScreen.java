@@ -50,30 +50,63 @@ public class LoginScreen extends AppCompatActivity {
     // loginUser metodunu oluşturuyoruz
     private void loginUser(String username, String password) {
         // Firestore'dan kullanıcının bilgilerini sorguluyoruz
-        db.collection("users")
-                .whereEqualTo("username", username)  // Kullanıcı adı ile eşleşen kullanıcıyı bul
-                .whereEqualTo("password", password)  // Şifre ile eşleşen kullanıcıyı bul
+        db.collection("admins")
+                .whereEqualTo("username", username)  // Kullanıcı adı ile eşleşen admini bul
+                .whereEqualTo("password", password)  // Şifre ile eşleşen admini bul
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
-                    if (queryDocumentSnapshots.isEmpty()) {
-                        // Kullanıcı adı ve şifre eşleşmiyorsa
-                        Toast.makeText(this, "Geçersiz kullanıcı adı veya şifre!", Toast.LENGTH_SHORT).show();
-                    } else {
-                        // Kullanıcı adı ve şifre eşleşiyorsa
-                        QuerySnapshot documents = queryDocumentSnapshots;
-                        DocumentSnapshot document = documents.getDocuments().get(0); // İlk eşleşen kullanıcıyı al
-                        String userId=document.getId();
-                        SharedPreferences sharedPreferences=getSharedPreferences("user_prefs",MODE_PRIVATE);
-                        SharedPreferences.Editor editor=sharedPreferences.edit();
-                        editor.putString("userId",userId);
-                        editor.apply();
-                        // Başarı mesajı
-                        Toast.makeText(this, "Giriş başarılı!", Toast.LENGTH_SHORT).show();
+                    if (!queryDocumentSnapshots.isEmpty()) {
+                        // Admin kullanıcı bulundu
+                        DocumentSnapshot document = queryDocumentSnapshots.getDocuments().get(0);
+                        String adminId = document.getId();
 
-                        // Burada giriş yapan kullanıcıyı yönlendirebilirsiniz
+                        // Admin id'sini SharedPreferences'e kaydet
+                        SharedPreferences sharedPreferences = getSharedPreferences("user_prefs", MODE_PRIVATE);
+                        SharedPreferences.Editor editor = sharedPreferences.edit();
+                        editor.putString("adminId", adminId);
+                        editor.apply();
+
+                        // Başarı mesajı
+                        Toast.makeText(this, "Giriş başarılı (Admin)!", Toast.LENGTH_SHORT).show();
+
+                        // Admin giriş yaptıysa HomePage'e yönlendirme
                         Intent intent = new Intent(LoginScreen.this, HomePage.class);
                         startActivity(intent);
                         finish();
+                    } else {
+                        // Admin değilse, users koleksiyonunda arama yapıyoruz
+                        db.collection("users")
+                                .whereEqualTo("username", username)  // Kullanıcı adı ile eşleşen user'ı bul
+                                .whereEqualTo("password", password)  // Şifre ile eşleşen user'ı bul
+                                .get()
+                                .addOnSuccessListener(queryDocumentSnapshots1 -> {
+                                    if (!queryDocumentSnapshots1.isEmpty()) {
+                                        // User bulundu
+                                        DocumentSnapshot document = queryDocumentSnapshots1.getDocuments().get(0);
+                                        String userId = document.getId();
+
+                                        // User id'sini SharedPreferences'e kaydet
+                                        SharedPreferences sharedPreferences = getSharedPreferences("user_prefs", MODE_PRIVATE);
+                                        SharedPreferences.Editor editor = sharedPreferences.edit();
+                                        editor.putString("userId", userId);
+                                        editor.apply();
+
+                                        // Başarı mesajı
+                                        Toast.makeText(this, "Giriş başarılı (User)!", Toast.LENGTH_SHORT).show();
+
+                                        // User giriş yaptıysa HomePage'e yönlendirme
+                                        Intent intent = new Intent(LoginScreen.this, HomePage.class);
+                                        startActivity(intent);
+                                        finish();
+                                    } else {
+                                        // Kullanıcı adı ve şifre eşleşmiyor
+                                        Toast.makeText(this, "Geçersiz kullanıcı adı veya şifre!", Toast.LENGTH_SHORT).show();
+                                    }
+                                })
+                                .addOnFailureListener(e -> {
+                                    // Hata durumunda yapılacak işlemler
+                                    Toast.makeText(this, "Hata oluştu, tekrar deneyin.", Toast.LENGTH_SHORT).show();
+                                });
                     }
                 })
                 .addOnFailureListener(e -> {

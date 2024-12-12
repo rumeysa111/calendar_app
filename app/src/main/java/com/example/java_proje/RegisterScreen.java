@@ -68,7 +68,7 @@ public class RegisterScreen extends AppCompatActivity {
     // addUser metodunu oluşturuyoruz
     private void addUser(String name, String surname, String email, String password, String username) {
         // Kullanıcı adı benzersiz mi kontrol ediyoruz
-        db.collection("users")
+        db.collection("admins")
                 .whereEqualTo("username", username)  // "username" alanında eşleşen bir değer olup olmadığını kontrol et
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
@@ -85,18 +85,33 @@ public class RegisterScreen extends AppCompatActivity {
                         user.put("username", username);
                         user.put("role", "admin");
                         user.put("isRegistered", true);
+                        user.put("isVerified", true);
 
-                        // Firestore'a kaydediyoruz
-                        db.collection("users")
+                        // Kullanıcı kaydını admins koleksiyonuna eklerken adminId ekliyoruz
+                        db.collection("admins")
                                 .add(user)  // Kullanıcı verisini ekliyoruz
                                 .addOnSuccessListener(documentReference -> {
                                     // Başarılı olduğunda yapılacak işlemler
-                                    Toast.makeText(RegisterScreen.this, "Kayıt başarılı!", Toast.LENGTH_SHORT).show();
+                                    String adminId = documentReference.getId();  // Oluşturulan adminId'yi alıyoruz
 
-                                    // LoginScreen'e yönlendiriyoruz
-                                    Intent intent = new Intent(RegisterScreen.this, LoginScreen.class);
-                                    startActivity(intent);
-                                    finish();
+                                    // adminId'yi de kaydediyoruz
+                                    Map<String, Object> updateData = new HashMap<>();
+                                    updateData.put("adminId", adminId);  // adminId'yi ekliyoruz
+
+                                    // adminId'yi güncelleme
+                                    documentReference.update(updateData)
+                                            .addOnSuccessListener(aVoid -> {
+                                                Toast.makeText(RegisterScreen.this, "Kayıt başarılı!", Toast.LENGTH_SHORT).show();
+
+                                                // LoginScreen'e yönlendiriyoruz
+                                                Intent intent = new Intent(RegisterScreen.this, LoginScreen.class);
+                                                startActivity(intent);
+                                                finish();
+                                            })
+                                            .addOnFailureListener(e -> {
+                                                Toast.makeText(RegisterScreen.this, "adminId kaydında hata oluştu.", Toast.LENGTH_SHORT).show();
+                                            });
+
                                 })
                                 .addOnFailureListener(e -> {
                                     // Hata durumunda yapılacak işlemler

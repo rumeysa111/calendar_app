@@ -36,94 +36,84 @@ public class TeamsFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-
-        LayoutInflater layoutInflater=LayoutInflater.from(getContext());
-View addUserview=layoutInflater.inflate(R.layout.item_team,null);
-        // Fragmanı inflate et
+        // Inflate the layout for the fragment
         View view = inflater.inflate(R.layout.fragment_teams, container, false);
 
         // Firestore instance
         db = FirebaseFirestore.getInstance();
 
-        // RecyclerView'yi ayarla
+        // RecyclerView setup
         recyclerView = view.findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        // Takım listesi oluştur
+        // Initialize the team list
         teamList = new ArrayList<>();
         teamAdapter = new TeamAdapter(teamList);
         recyclerView.setAdapter(teamAdapter);
-        Button btnAddUser = addUserview.findViewById(R.id.btnAddUser);
-        btnAddUser.setOnClickListener(v -> showAddUserDialog());
 
+        // Fetch teams
+        fetchTeams();
 
-        // Ekip Oluştur butonuna tıklama işlemi
+        // Button to create a new team
         Button btnCreateTeam = view.findViewById(R.id.btnCreateTeam);
         btnCreateTeam.setOnClickListener(v -> showCreateTeamDialog());
+
+        // Set listener for adding a user to a team
         teamAdapter.setOnAddUserClickListener(new TeamAdapter.OnAddUserClickListener() {
             @Override
             public void onAddUserClick(Team team) {
                 showAddUserDialog();
-
             }
-
-            // Add User dialogunu göster
         });
-
-        // Mevcut ekipleri Firestore'dan çek
-        fetchTeams();
 
         return view;
     }
+
+    // Show dialog for adding a user
     private void showAddUserDialog() {
-        Dialog dialog = new Dialog(getContext());
-        dialog.setContentView(R.layout.dialog_add_user); // Yeni bir XML dosyası oluşturun
+        Dialog dialog = new Dialog(requireContext());
+        dialog.setContentView(R.layout.dialog_add_user);
         dialog.setCancelable(true);
 
+        // Get references to the EditText and Button inside the dialog
         EditText etUsername = dialog.findViewById(R.id.etUsername);
         EditText etPassword = dialog.findViewById(R.id.etPassword);
         EditText etRole = dialog.findViewById(R.id.etRole);
-        Button btnAdd = dialog.findViewById(R.id.btnSaveTeam);
+        Button btnAdd = dialog.findViewById(R.id.btnSaveUser);  // Correct the button ID to match the one in the layout
 
         btnAdd.setOnClickListener(view -> {
             String username = etUsername.getText().toString().trim();
             String password = etPassword.getText().toString().trim();
             String role = etRole.getText().toString().trim();
 
+            // Validate input fields
             if (username.isEmpty() || password.isEmpty() || role.isEmpty()) {
                 Toast.makeText(getContext(), "Lütfen tüm alanları doldurun!", Toast.LENGTH_SHORT).show();
             } else {
-                if (!getTeamList().isEmpty()) {
-
-                    addUserToTeam(getTeamList().get(0), username, password, role);
+                if (!teamList.isEmpty()) { // If there is a valid team
+                    addUserToTeam(teamList.get(0), username, password, role);
                     dialog.dismiss();
-
-                }else{
-                    Toast.makeText(getContext(),"geçerli bir takım  bulunamadı",Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(getContext(), "Geçerli bir takım bulunamadı", Toast.LENGTH_SHORT).show();
                 }
-                // Kullanıcıyı ekle
-
             }
         });
 
-        dialog.
-                show();
+        dialog.show();
     }
 
-
-    // Custom dialog gösterme metodu
+    // Show dialog for creating a new team
     private void showCreateTeamDialog() {
-        // Yeni bir dialog oluştur
         Dialog dialog = new Dialog(getContext());
         dialog.setContentView(R.layout.dialog_create_team);
-        dialog.setCancelable(true); // Kullanıcı dışarı tıklarsa kapatabilsin
+        dialog.setCancelable(true);
 
-        // Diyalog içindeki bileşenlere eriş
+        // Get references to the EditText and Button inside the dialog
         EditText etTeamName = dialog.findViewById(R.id.etTeamName);
         EditText etTeamDescription = dialog.findViewById(R.id.etTeamDescription);
         Button btnSaveTeam = dialog.findViewById(R.id.btnSaveTeam);
 
-        // Kaydet butonuna tıklama işlemi
+        // Button click for saving team
         btnSaveTeam.setOnClickListener(view -> {
             String teamName = etTeamName.getText().toString().trim();
             String teamDescription = etTeamDescription.getText().toString().trim();
@@ -136,10 +126,11 @@ View addUserview=layoutInflater.inflate(R.layout.item_team,null);
                 dialog.dismiss();
             }
         });
+
         dialog.show();
     }
 
-    // Ekipleri Firestore'a kaydetme metodu
+    // Add team to Firestore
     private void addTeams(String teamName, String teamDescription) {
         SharedPreferences sharedPreferences = getContext().getSharedPreferences("user_prefs", getContext().MODE_PRIVATE);
         String userId = sharedPreferences.getString("userId", null);
@@ -153,7 +144,7 @@ View addUserview=layoutInflater.inflate(R.layout.item_team,null);
             db.collection("teams").add(team)
                     .addOnSuccessListener(documentReference -> {
                         Toast.makeText(getContext(), "Ekip oluşturuldu: " + teamName, Toast.LENGTH_SHORT).show();
-                        fetchTeams();  // Ekip oluşturulduktan sonra tekrar ekipleri çek
+                        fetchTeams();  // Fetch teams again after creating the team
                     })
                     .addOnFailureListener(e -> Toast.makeText(getContext(), "Ekip oluşturulamadı.", Toast.LENGTH_SHORT).show());
         } else {
@@ -161,44 +152,36 @@ View addUserview=layoutInflater.inflate(R.layout.item_team,null);
         }
     }
 
-    // Mevcut ekipleri Firestore'dan çekme metodu
+    // Fetch teams from Firestore
     private void fetchTeams() {
         db.collection("teams")
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
-                    teamList.clear();  // Önceki verileri temizle
+                    teamList.clear();
                     for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
-                        String teamId=document.getId();
+                        String teamId = document.getId();
                         String teamName = document.getString("teamName");
-                        teamList.add(new Team(teamName,teamId));
+                        teamList.add(new Team(teamName, teamId));
                     }
-                    teamAdapter.notifyDataSetChanged();  // Adapter'ı güncelle
+                    teamAdapter.notifyDataSetChanged();  // Notify adapter of new data
                 })
                 .addOnFailureListener(e -> Toast.makeText(getContext(), "Ekipler alınamadı.", Toast.LENGTH_SHORT).show());
     }
-    // Firestore'a kullanıcı ekleme metodu
-    private void addUserToTeam(Team team, String username, String password, String role) {
-        db = FirebaseFirestore.getInstance();
 
+    // Add user to team in Firestore
+    private void addUserToTeam(Team team, String username, String password, String role) {
         Map<String, Object> user = new HashMap<>();
         user.put("username", username);
         user.put("password", password);
         user.put("role", role);
+        user.put("teamId", team.getId());
 
-        db.collection("teams").document(team.getId())
-                .collection("users").add(user)
+        db.collection("users").add(user)
                 .addOnSuccessListener(documentReference -> {
-                    Toast.makeText(getContext(), "Kullanıcı eklendi", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "Kullanıcı eklendi: " + documentReference.getId(), Toast.LENGTH_SHORT).show();
                 })
                 .addOnFailureListener(e -> {
-                    Toast.makeText(getContext(), "Kullanıcı eklenemedi.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "Kullanıcı eklenemedi: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                 });
     }
-    // Dummy Team Listesi
-    private ArrayList<Team> getTeamList() {
-        ArrayList<Team> list = new ArrayList<>();
-
-        return list;
-    }
-
 }
