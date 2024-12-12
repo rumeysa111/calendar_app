@@ -22,6 +22,10 @@ public class HomePage extends AppCompatActivity {
         binding=ActivityHomePageBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         replaceFragment(new CalendarFragment());
+        // ActionBar'ı set et
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);  // Geri butonu
+        }
 
         binding.bottomNavigation.setOnItemSelectedListener(item -> {
             int itemId = item.getItemId();

@@ -1,0 +1,34 @@
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <!-- Ekip Adı -->
+    <EditText
+        android:id="@+id/etTeamName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Ekip Adı"
+        android:inputType="text"
+        android:layout_marginBottom="12dp" />
+
+    <!-- Ekip Açıklaması -->
+    <EditText
+        android:id="@+id/etTeamDescription"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Ekip Açıklaması"
+        android:inputType="text"
+        android:layout_marginBottom="12dp" />
+
+    <!-- Kaydet Butonu -->
+    <Button
+        android:id="@+id/btnSaveTeam"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Ekip Kaydet"
+
+        android:textColor="@android:color/white" />
+</LinearLayout>

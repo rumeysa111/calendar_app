@@ -13,6 +13,9 @@
         android:theme="@style/Theme.Java_proje"
         tools:targetApi="31">
         <activity
+            android:name=".TeamAdapter"
+            android:exported="false" />
+        <activity
             android:name=".HomePage"
             android:exported="false" />
         <activity

@@ -45,13 +45,17 @@ dependencies {
     implementation(libs.firebase.firestore)
     implementation("com.google.android.material:material:1.12.0")
     implementation(libs.lifecycle.livedata.ktx)
+    implementation("androidx.recyclerview:recyclerview:1.3.2")
     implementation(libs.lifecycle.viewmodel.ktx)
     implementation(libs.navigation.fragment)
     implementation(libs.navigation.ui)
+    implementation(libs.recyclerview)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
     implementation(platform("com.google.firebase:firebase-bom:33.7.0"))
     implementation ("com.google.firebase:firebase-firestore:25.1.1")
+    implementation ("androidx.databinding:databinding-runtime:7.3.1") // Versiyon numarasını kontrol edin
+
 
 }

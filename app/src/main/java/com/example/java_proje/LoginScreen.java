@@ -1,6 +1,7 @@
 package com.example.java_proje;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
@@ -61,7 +62,11 @@ public class LoginScreen extends AppCompatActivity {
                         // Kullanıcı adı ve şifre eşleşiyorsa
                         QuerySnapshot documents = queryDocumentSnapshots;
                         DocumentSnapshot document = documents.getDocuments().get(0); // İlk eşleşen kullanıcıyı al
-
+                        String userId=document.getId();
+                        SharedPreferences sharedPreferences=getSharedPreferences("user_prefs",MODE_PRIVATE);
+                        SharedPreferences.Editor editor=sharedPreferences.edit();
+                        editor.putString("userId",userId);
+                        editor.apply();
                         // Başarı mesajı
                         Toast.makeText(this, "Giriş başarılı!", Toast.LENGTH_SHORT).show();
 
