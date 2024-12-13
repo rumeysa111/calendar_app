@@ -50,8 +50,10 @@ public class TeamAdapter extends RecyclerView.Adapter<TeamAdapter.TeamViewHolder
         holder.usersRecyclerView.setAdapter(userAdapter);
         fetchUsersForTeam(team.getId(), userAdapter);
         SharedPreferences sharedPreferences=holder.itemView.getContext().getSharedPreferences("user_prefs",MODE_PRIVATE);
+        String userRole = sharedPreferences.getString("role", "user");
+
         boolean canAddUser=sharedPreferences.getBoolean("canAddUser",false);
-        if(!canAddUser){
+        if(!"admin".equals(userRole) && !canAddUser){
             holder.btnAddUser.setVisibility(View.GONE);
         }else{
             holder.btnAddUser.setVisibility(View.VISIBLE);
