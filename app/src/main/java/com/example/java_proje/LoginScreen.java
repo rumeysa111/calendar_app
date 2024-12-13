@@ -41,9 +41,14 @@ public class LoginScreen extends AppCompatActivity {
             String username = usernameEditText.getText().toString().trim();
             String password = passwordEditText.getText().toString().trim();
 
+            // Kullanıcı adı ve şifrenin boş olup olmadığını kontrol ediyoruz
+            if (username.isEmpty() || password.isEmpty()) {
+                Toast.makeText(this, "Kullanıcı adı ve şifre boş olamaz!", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
             // Kullanıcı bilgilerini Firestore'dan doğruluyoruz
             loginUser(username, password);
-
         });
     }
 
@@ -64,6 +69,7 @@ public class LoginScreen extends AppCompatActivity {
                         SharedPreferences sharedPreferences = getSharedPreferences("user_prefs", MODE_PRIVATE);
                         SharedPreferences.Editor editor = sharedPreferences.edit();
                         editor.putString("adminId", adminId);
+                        editor.putString("role", "admin");
                         editor.apply();
 
                         // Başarı mesajı
@@ -84,11 +90,16 @@ public class LoginScreen extends AppCompatActivity {
                                         // User bulundu
                                         DocumentSnapshot document = queryDocumentSnapshots1.getDocuments().get(0);
                                         String userId = document.getId();
+                                        boolean canAddUser = document.getBoolean("canAddUser");
+                                        boolean canCreateMeeting = document.getBoolean("canCreateMeeting");
 
                                         // User id'sini SharedPreferences'e kaydet
                                         SharedPreferences sharedPreferences = getSharedPreferences("user_prefs", MODE_PRIVATE);
                                         SharedPreferences.Editor editor = sharedPreferences.edit();
                                         editor.putString("userId", userId);
+                                        editor.putString("role", "user");
+                                        editor.putBoolean("canAddUser", canAddUser);
+                                        editor.putBoolean("canCreateMeeting", canCreateMeeting);
                                         editor.apply();
 
                                         // Başarı mesajı

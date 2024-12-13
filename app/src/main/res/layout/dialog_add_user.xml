@@ -43,6 +43,12 @@
         android:text="Toplantı düzenleme yetkisi"
         android:layout_marginTop="8dp" />
 
+    <CheckBox
+        android:id="@+id/cbPermissionAddUser"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Kullanıcı ekleme yetkisi"
+        android:layout_marginTop="8dp" />
 
 
     <Button

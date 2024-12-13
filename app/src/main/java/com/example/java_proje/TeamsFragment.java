@@ -29,6 +29,8 @@ public class TeamsFragment extends Fragment {
     private RecyclerView recyclerView;
     private TeamAdapter teamAdapter;
     private ArrayList<Team> teamList;
+    // Users listesi tanımlanmalı
+    private ArrayList<User> users = new ArrayList<>();
 
     public TeamsFragment() {
         // Required empty public constructor
@@ -58,11 +60,22 @@ public class TeamsFragment extends Fragment {
         // Button to create a new team
         Button btnCreateTeam = view.findViewById(R.id.btnCreateTeam);
         btnCreateTeam.setOnClickListener(v -> showCreateTeamDialog());
+        SharedPreferences sharedPreferences = getContext().getSharedPreferences("user_prefs", getContext().MODE_PRIVATE);
+        String role=sharedPreferences.getString("role","user");
 
+//Button btnCreateTeam=getView().findViewById(R.id.btnCreateTeam);
+        if("admin".equals(role)){
+            btnCreateTeam.setVisibility(View.VISIBLE);
+
+        }else{
+            btnCreateTeam.setVisibility(View.GONE);
+        }
         // Set listener for adding a user to a team
         teamAdapter.setOnAddUserClickListener(new TeamAdapter.OnAddUserClickListener() {
             @Override
             public void onAddUserClick(Team team) {
+
+                fetchUsersForTeam(team.getId());
                 showAddUserDialog();
             }
         });
@@ -83,6 +96,8 @@ public class TeamsFragment extends Fragment {
         EditText etRole = dialog.findViewById(R.id.etRole);
         Button btnAdd = dialog.findViewById(R.id.btnSave2User);  // Correct the button ID to match the one in the layout
         CheckBox cbCanCreateMeeting=dialog.findViewById(R.id.cbMeetingPermission);
+        CheckBox cbCanAddUser=dialog.findViewById(R.id.cbPermissionAddUser);
+
 
         btnAdd.setOnClickListener(view -> {
             String username = etUsername.getText().toString().trim();
@@ -94,7 +109,7 @@ public class TeamsFragment extends Fragment {
                 Toast.makeText(getContext(), "Lütfen tüm alanları doldurun!", Toast.LENGTH_SHORT).show();
             } else {
                 if (!teamList.isEmpty()) { // If there is a valid team
-                    addUserToTeam(teamList.get(0), username, password, role,cbCanCreateMeeting.isChecked());
+                    addUserToTeam(teamList.get(0), username, password, role,cbCanCreateMeeting.isChecked(),cbCanAddUser.isChecked());
                     dialog.dismiss();
                 } else {
                     Toast.makeText(getContext(), "Geçerli bir takım bulunamadı", Toast.LENGTH_SHORT).show();
@@ -116,6 +131,7 @@ public class TeamsFragment extends Fragment {
         EditText etTeamDescription = dialog.findViewById(R.id.etTeamDescription);
         Button btnSaveTeam = dialog.findViewById(R.id.btnSaveTeam);
         CheckBox cbCanCreateMeeting=dialog.findViewById(R.id.cbMeetingPermission);
+        CheckBox cbCanAddUser=dialog.findViewById(R.id.cbPermissionAddUser);
 
 
         // Button click for saving team
@@ -136,24 +152,47 @@ public class TeamsFragment extends Fragment {
         dialog.show();
     }
 
-    // Add team to Firestore
     private void addTeams(String teamName, String teamDescription) {
+        Dialog dialog = new Dialog(getContext());
+        dialog.setContentView(R.layout.dialog_create_team);
+        dialog.setCancelable(true);
         SharedPreferences sharedPreferences = getContext().getSharedPreferences("user_prefs", getContext().MODE_PRIVATE);
-    //    String userId = sharedPreferences.getString("userId", null);
-         String adminId = sharedPreferences.getString("adminId", null);
+
+        String adminId = sharedPreferences.getString("adminId", null);
+
+
+
+
         if (adminId != null) {
             Map<String, Object> team = new HashMap<>();
             team.put("teamName", teamName);
             team.put("teamDescription", teamDescription);
-          //  team.put("userId", userId);
             team.put("adminId", adminId);
 
+            // Firestore'da yeni bir takım oluştur
             db.collection("teams").add(team)
                     .addOnSuccessListener(documentReference -> {
-                        Toast.makeText(requireContext(), "Ekip oluşturuldu: " + teamName, Toast.LENGTH_SHORT).show();
-                        fetchTeams();  // Fetch teams again after creating the team
+                        // Ekip başarıyla oluşturuldu ve document ID'si alındı
+                        String teamId = documentReference.getId(); // Team ID'si alındı
+
+                        // Şimdi bu ID'yi teams koleksiyonuna kaydetmek veya başka bir işlem yapmak için kullanabilirsiniz
+                        Map<String, Object> updatedTeam = new HashMap<>();
+                        updatedTeam.put("teamId", teamId); // Yeni oluşturduğumuz team ID'sini ekliyoruz
+
+                        // Eğer bu ID'yi Firestore'a kaydetmek isterseniz:
+                        db.collection("teams").document(teamId) // ID ile belgeyi buluyoruz
+                                .update(updatedTeam)
+                                .addOnSuccessListener(aVoid -> {
+                                    Toast.makeText(requireContext(), "Ekip oluşturuldu: " + teamName, Toast.LENGTH_SHORT).show();
+                                    fetchTeams();  // Takımları yeniden al
+                                })
+                                .addOnFailureListener(e -> {
+                                    Toast.makeText(getContext(), "Ekip ID'si kaydedilemedi.", Toast.LENGTH_SHORT).show();
+                                });
                     })
-                    .addOnFailureListener(e -> Toast.makeText(getContext(), "Ekip oluşturulamadı.", Toast.LENGTH_SHORT).show());
+                    .addOnFailureListener(e -> {
+                        Toast.makeText(getContext(), "Ekip oluşturulamadı.", Toast.LENGTH_SHORT).show();
+                    });
         } else {
             Toast.makeText(requireContext(), "Kullanıcı ID bulunamadı.", Toast.LENGTH_SHORT).show();
         }
@@ -183,7 +222,7 @@ public class TeamsFragment extends Fragment {
     }
 
     // Add user to team in Firestore
-    private void addUserToTeam(Team team, String username, String password, String role,boolean canCreateMeeting) {
+    private void addUserToTeam(Team team, String username, String password, String role,boolean canCreateMeeting,boolean canAddUser) {
         SharedPreferences sharedPreferences = getContext().getSharedPreferences("user_prefs", getContext().MODE_PRIVATE);
         String adminId = sharedPreferences.getString("adminId", null);
 
@@ -194,6 +233,7 @@ public class TeamsFragment extends Fragment {
         user.put("teamId", team.getId());
         user.put("adminId",adminId);
         user.put("canCreateMeeting", canCreateMeeting); // Add the permission
+        user.put("canAddUser",canAddUser);
 
         db.collection("users").add(user)
                 .addOnSuccessListener(documentReference -> {
@@ -203,4 +243,30 @@ public class TeamsFragment extends Fragment {
                     Toast.makeText(getContext(), "Kullanıcı eklenemedi: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                 });
     }
+
+    private void fetchUsersForTeam(String teamId){
+        // Verileri alırken önce users listesini temizliyoruz
+        users.clear();
+
+        db.collection("users")
+                .whereEqualTo("teamId", teamId)
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
+                        String username = document.getString("username");
+                        String role = document.getString("role");
+                        users.add(new User(username, role));
+                    }
+
+                    // RecyclerView ve Adapter'ı güncelle
+                    UserAdapter userAdapter = new UserAdapter(users);
+                    RecyclerView usersRecyclerView = getView().findViewById(R.id.usersRecyclerView);
+                    usersRecyclerView.setAdapter(userAdapter);
+
+                    // Adapter'a veri değişikliklerini bildir
+                    userAdapter.notifyDataSetChanged();
+                })
+                .addOnFailureListener(e -> Toast.makeText(getContext(), "Kullanıcılar alınamadı", Toast.LENGTH_SHORT).show());
+    }
+
 }
