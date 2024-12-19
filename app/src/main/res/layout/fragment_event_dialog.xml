@@ -1,0 +1,88 @@
+<!-- add_event_dialog.xml -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <!-- Event Title and Description -->
+    <EditText
+        android:id="@+id/et_event_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Etkinlik Başlığı" />
+
+
+    <!-- Tarih seçme butonu -->
+    <Button
+        android:id="@+id/btn_select_date"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Tarih Seç" />
+
+
+    <EditText
+        android:id="@+id/et_event_description"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Etkinlik Açıklaması" />
+
+    <!-- Team Selection -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Ekip Seç:" />
+
+    <CheckBox
+        android:id="@+id/checkboxManagement"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Yönetim Kurulu" />
+
+    <CheckBox
+        android:id="@+id/checkboxAssistant"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Asistan" />
+
+    <CheckBox
+        android:id="@+id/checkboxUI"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="UI Ekibi" />
+
+    <!-- Add and Cancel Buttons -->
+
+    <TextView
+        android:id="@+id/tv_selected_date"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Tarih:" />
+
+    <Button
+        android:id="@+id/btn_select_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Saat Seç" />
+
+
+
+    <Spinner
+        android:id="@+id/sp_team_selection"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <Button
+        android:id="@+id/btn_add"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Ekle" />
+
+    <Button
+        android:id="@+id/btn_cancel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="İptal" />
+
+
+</LinearLayout>
