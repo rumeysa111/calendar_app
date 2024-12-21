@@ -1,88 +1,111 @@
-<!-- add_event_dialog.xml -->
+<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
+    android:background="@color/white"
     android:padding="16dp">
 
-    <!-- Event Title and Description -->
-    <EditText
-        android:id="@+id/et_event_title"
+
+    <!-- Kart Stilinde Başlık -->
+    <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Etkinlik Başlığı" />
+        android:layout_marginBottom="16dp"
+        app:cardElevation="4dp"
+        app:cardCornerRadius="8dp"
+        android:backgroundTint="@color/white">
 
+        <EditText
+            android:id="@+id/et_event_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Etkinlik Başlığı"
+            android:padding="12dp"
+            android:background="@drawable/edit_text_background"
+            android:textColor="@color/black"
+            android:textColorHint="@color/gray"
+            android:textSize="16sp" />
+    </androidx.cardview.widget.CardView>
 
-    <!-- Tarih seçme butonu -->
-    <Button
-        android:id="@+id/btn_select_date"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Tarih Seç" />
-
-
-    <EditText
-        android:id="@+id/et_event_description"
+    <!-- Açıklama -->
+    <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Etkinlik Açıklaması" />
+        android:layout_marginBottom="16dp"
+        app:cardElevation="4dp"
+        app:cardCornerRadius="8dp"
+        android:backgroundTint="@color/white">
 
-    <!-- Team Selection -->
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Ekip Seç:" />
+        <EditText
+            android:id="@+id/et_event_description"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Etkinlik Açıklaması"
+            android:padding="12dp"
+            android:background="@drawable/edit_text_background"
+            android:textColor="@color/black"
+            android:textColorHint="@color/gray"
+            android:textSize="16sp" />
+    </androidx.cardview.widget.CardView>
 
-    <CheckBox
-        android:id="@+id/checkboxManagement"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Yönetim Kurulu" />
-
-    <CheckBox
-        android:id="@+id/checkboxAssistant"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Asistan" />
-
-    <CheckBox
-        android:id="@+id/checkboxUI"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="UI Ekibi" />
-
-    <!-- Add and Cancel Buttons -->
-
+    <!-- Tarih Bilgisi -->
     <TextView
         android:id="@+id/tv_selected_date"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Tarih:" />
+        android:text="Tarih:"
+        android:textSize="16sp"
+        android:textColor="@color/black"
+        android:layout_marginBottom="8dp" />
 
-    <Button
+    <!-- Saat Seç Butonu -->
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/btn_select_time"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Saat Seç" />
+        android:text="Saat Seç"
+        android:layout_marginBottom="16dp"
+        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+        android:textAllCaps="false" />
 
-
-
+    <!-- Takım Seçimi -->
     <Spinner
         android:id="@+id/sp_team_selection"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-
-    <Button
-        android:id="@+id/btn_add"
-        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Ekle" />
+        android:layout_marginBottom="16dp"
+        android:backgroundTint="@color/gray" />
 
-    <Button
-        android:id="@+id/btn_cancel"
-        android:layout_width="wrap_content"
+    <!-- Butonlar -->
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="İptal" />
+        android:orientation="horizontal"
+        android:gravity="center">
 
+        <!-- Ekle Butonu -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_add"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Ekle"
+            android:layout_marginEnd="8dp"
+            style="@style/Widget.MaterialComponents.Button"
+            android:textAllCaps="false" />
+
+        <!-- İptal Butonu -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_cancel"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="İptal"
+            android:layout_marginStart="8dp"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:textAllCaps="false" />
+    </LinearLayout>
 
 </LinearLayout>

@@ -2,6 +2,7 @@ package com.example.java_proje;
 
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,15 +14,19 @@ import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.FragmentActivity;
 import android.content.Context;
 
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class EventDialogFragment extends DialogFragment {
 
     private CalendarFragment calendarFragment; // CalendarFragment referansı
+    private FirebaseFirestore db;
 
     public static EventDialogFragment newInstance(Date selectedDay, List<String> teams) {
         EventDialogFragment fragment = new EventDialogFragment();
@@ -37,6 +42,8 @@ public class EventDialogFragment extends DialogFragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         // Dialog için layout'u inflate et
         View view = inflater.inflate(R.layout.fragment_event_dialog, container, false);
+
+        db = FirebaseFirestore.getInstance(); // Firestore bağlantısı
 
         // Tarihi göster
         TextView selectedDateTextView = view.findViewById(R.id.tv_selected_date);
@@ -54,7 +61,7 @@ public class EventDialogFragment extends DialogFragment {
             timePicker.show();
         });
 
-        // Takvim seçici butonu
+        /*// Takvim seçici butonu
         Button dateButton = view.findViewById(R.id.btn_select_date);
         dateButton.setOnClickListener(v -> {
             Calendar calendar = Calendar.getInstance();
@@ -68,7 +75,7 @@ public class EventDialogFragment extends DialogFragment {
                         selectedDateTextView.setText("Tarih: " + selectedDayOfMonth + "/" + (selectedMonth + 1) + "/" + selectedYear);
                     }, year, month, day);
             datePickerDialog.show();
-        });
+        });*/
 
         // Spinner'ı takımlar için doldur
         Spinner teamSpinner = view.findViewById(R.id.sp_team_selection);
@@ -88,10 +95,13 @@ public class EventDialogFragment extends DialogFragment {
             if (title.isEmpty() || description.isEmpty()) {
                 Toast.makeText(getContext(), "Tüm alanları doldurun!", Toast.LENGTH_SHORT).show();
             } else {
-                // CalendarFragment'ı bulup addEvent() metodunu çağırıyoruz
                 if (calendarFragment != null) {
+                    // Etkinliği CalendarFragment'e gönder
                     calendarFragment.addEvent(title, description, selectedTeam, selectedDay);
                 }
+
+                // Firestore'a kaydet
+                saveEventToFirestore(title, description, selectedTeam, selectedDay);
                 dismiss(); // Dialog'u kapat
             }
         });
@@ -101,6 +111,29 @@ public class EventDialogFragment extends DialogFragment {
         cancelButton.setOnClickListener(v -> dismiss()); // Dialog'u kapat
 
         return view;
+    }
+
+    private void saveEventToFirestore(String title, String description, String selectedTeam, Date selectedDate) {
+        SharedPreferences sharedPreferences = requireContext().getSharedPreferences("user_prefs", Context.MODE_PRIVATE);
+        String adminId = sharedPreferences.getString("adminId", "unknownAdmin");
+        String teamId = "teamId_placeholder"; // Gerçek teamId'yi almanız gerekebilir.
+
+        Map<String, Object> event = new HashMap<>();
+        event.put("eventId", db.collection("events").document().getId()); // Otomatik ID
+        event.put("eventName", title);
+        event.put("eventDescription", description);
+        event.put("teamName", selectedTeam);
+        event.put("selectedDate", selectedDate);
+        event.put("adminId", adminId);
+        event.put("teamId", teamId);
+
+        db.collection("events").add(event)
+                .addOnSuccessListener(documentReference -> {
+                    Toast.makeText(requireContext(), "Etkinlik başarıyla Firestore'a eklendi!", Toast.LENGTH_SHORT).show();
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(requireContext(), "Etkinlik eklenirken hata oluştu: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                });
     }
 
     @Override
