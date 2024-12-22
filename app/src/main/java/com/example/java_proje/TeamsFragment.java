@@ -76,7 +76,7 @@ public class TeamsFragment extends Fragment {
             public void onAddUserClick(Team team) {
 
                 fetchUsersForTeam(team.getId());
-                showAddUserDialog();
+                showAddUserDialog(team.getId());
             }
         });
 
@@ -84,7 +84,7 @@ public class TeamsFragment extends Fragment {
     }
 
     // Show dialog for adding a user
-    private void showAddUserDialog() {
+    private void showAddUserDialog(String teamId) {
         Dialog dialog = new Dialog(requireContext());
         dialog.setContentView(R.layout.dialog_add_user);
         dialog.setCancelable(true);
@@ -109,7 +109,7 @@ public class TeamsFragment extends Fragment {
                 Toast.makeText(getContext(), "Lütfen tüm alanları doldurun!", Toast.LENGTH_SHORT).show();
             } else {
                 if (!teamList.isEmpty()) { // If there is a valid team
-                    addUserToTeam(teamList.get(0), username, password, role,cbCanCreateMeeting.isChecked(),cbCanAddUser.isChecked());
+                    addUserToTeam(teamId, username, password, role,cbCanCreateMeeting.isChecked(),cbCanAddUser.isChecked());
                     dialog.dismiss();
                 } else {
                     Toast.makeText(getContext(), "Geçerli bir takım bulunamadı", Toast.LENGTH_SHORT).show();
@@ -222,7 +222,7 @@ public class TeamsFragment extends Fragment {
     }
 
     // Add user to team in Firestore
-    private void addUserToTeam(Team team, String username, String password, String role,boolean canCreateMeeting,boolean canAddUser) {
+    private void addUserToTeam(String teamId, String username, String password, String role,boolean canCreateMeeting,boolean canAddUser) {
         SharedPreferences sharedPreferences = getContext().getSharedPreferences("user_prefs", getContext().MODE_PRIVATE);
         String adminId = sharedPreferences.getString("adminId", null);
 
@@ -230,7 +230,7 @@ public class TeamsFragment extends Fragment {
         user.put("username", username);
         user.put("password", password);
         user.put("role", role);
-        user.put("teamId", team.getId());
+        user.put("teamId", teamId);
         user.put("adminId",adminId);
         user.put("canCreateMeeting", canCreateMeeting); // Add the permission
         user.put("canAddUser",canAddUser);

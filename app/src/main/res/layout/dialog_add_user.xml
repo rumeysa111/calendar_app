@@ -1,60 +1,98 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:padding="16dp">
+    android:layout_margin="16dp"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="8dp"
+    android:background="#FFFFFF">
 
-    <EditText
-        android:id="@+id/etUsername"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Kullanıcı Adı"
-        android:inputType="text" />
+        android:orientation="vertical"
+        android:padding="16dp">
 
-    <EditText
-        android:id="@+id/etPassword"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Şifre"
-        android:inputType="textPassword" />
+        <!-- Kullanıcı Adı -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Kullanıcı Adı">
 
-    <EditText
-        android:id="@+id/etRole"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Rol"
-        android:inputType="text" />
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etUsername"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="text" />
+        </com.google.android.material.textfield.TextInputLayout>
 
-    <!-- Yetki Seçenekleri Başlığı -->
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Yetkiler:"
-        android:textSize="16sp"
-        android:textStyle="bold"
-        android:layout_marginTop="16dp" />
+        <!-- Şifre -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Şifre"
+            android:layout_marginTop="8dp">
 
-    <!-- Toplantı Düzenleme Yetkisi -->
-    <CheckBox
-        android:id="@+id/cbMeetingPermission"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Toplantı düzenleme yetkisi"
-        android:layout_marginTop="8dp" />
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etPassword"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textPassword" />
+        </com.google.android.material.textfield.TextInputLayout>
 
-    <CheckBox
-        android:id="@+id/cbPermissionAddUser"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Kullanıcı ekleme yetkisi"
-        android:layout_marginTop="8dp" />
+        <!-- Rol -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Rol"
+            android:layout_marginTop="8dp">
 
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etRole"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="text" />
+        </com.google.android.material.textfield.TextInputLayout>
 
-    <Button
-        android:id="@+id/btnSave2User"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Kaydet"
-        android:layout_marginTop="16dp" />
-</LinearLayout>
+        <!-- Yetki Seçenekleri Başlığı -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Yetkiler:"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:textColor="@color/black"
+            android:layout_marginTop="16dp" />
+
+        <!-- Yetki Seçenekleri -->
+        <CheckBox
+            android:id="@+id/cbMeetingPermission"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Toplantı düzenleme yetkisi"
+            android:layout_marginTop="8dp" />
+
+        <CheckBox
+            android:id="@+id/cbPermissionAddUser"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Kullanıcı ekleme yetkisi"
+            android:layout_marginTop="8dp" />
+
+        <!-- Kaydet Butonu -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnSave2User"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="Kaydet"
+            app:cornerRadius="8dp"
+
+            android:textColor="#FFFFFF"
+
+            android:fontFamily="sans-serif-medium" />
+    </LinearLayout>
+
+</androidx.cardview.widget.CardView>

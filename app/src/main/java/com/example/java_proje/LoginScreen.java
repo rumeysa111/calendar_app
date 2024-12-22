@@ -100,6 +100,7 @@ public class LoginScreen extends AppCompatActivity {
                                         editor.putString("role", "user");
                                         editor.putBoolean("canAddUser", canAddUser);
                                         editor.putBoolean("canCreateMeeting", canCreateMeeting);
+
                                         editor.apply();
 
                                         // Başarı mesajı
