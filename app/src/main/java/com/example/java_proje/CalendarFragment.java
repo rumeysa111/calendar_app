@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CalendarView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -16,6 +17,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -38,6 +40,9 @@ public class CalendarFragment extends Fragment {
             selectedDate = new Date(year - 1900, month, dayOfMonth); // Seçilen tarihi kaydet
         });
 
+        // Etkinlikleri Firestore'dan getir
+        fetchEvents();
+
         // Etkinlik Ekle Butonu
         Button addEventButton = view.findViewById(R.id.buttonAddEvent);
         addEventButton.setOnClickListener(v -> {
@@ -57,6 +62,7 @@ public class CalendarFragment extends Fragment {
 
         return view;
     }
+
 
     public void addEvent(String title, String description, String selectedTeam, Date selectedDate) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -82,5 +88,66 @@ public class CalendarFragment extends Fragment {
                     Toast.makeText(requireContext(), "Etkinlik eklenirken hata oluştu: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                 });
     }
+
+    private void fetchEvents() {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+        db.collection("events")
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        StringBuilder sb = new StringBuilder();
+                        for (QueryDocumentSnapshot document : task.getResult()) {
+                            // Firestore'daki event verilerini al
+                            String title = document.getString("eventName");
+                            String description = document.getString("eventDescription");
+                            Date date = document.getDate("selectedDate");
+                            String teamName = document.getString("teamName");
+
+                            // Her bir etkinliği String'e ekle
+                            sb.append("Başlık: ").append(title).append("\n")
+                                    .append("Açıklama: ").append(description).append("\n")
+                                    .append("Tarih: ").append(date).append("\n")
+                                    .append("Takım: ").append(teamName).append("\n\n");
+                        }
+
+                        // TextView'de göster
+                        TextView tvSonuc = getView().findViewById(R.id.tvSonuc);
+                        tvSonuc.setText(sb.toString());
+                    } else {
+                        Toast.makeText(getContext(), "Veri alınırken hata oluştu: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                });
+    }
+
+    private void listenToRealtimeUpdates() {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+        db.collection("events")
+                .addSnapshotListener((value, error) -> {
+                    if (error != null) {
+                        Toast.makeText(getContext(), "Hata: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+
+                    StringBuilder sb = new StringBuilder();
+                    for (QueryDocumentSnapshot document : value) {
+                        String title = document.getString("eventName");
+                        String description = document.getString("eventDescription");
+                        Date date = document.getDate("selectedDate");
+                        String teamName = document.getString("teamName");
+
+                        sb.append("Başlık: ").append(title).append("\n")
+                                .append("Açıklama: ").append(description).append("\n")
+                                .append("Tarih: ").append(date).append("\n")
+                                .append("Takım: ").append(teamName).append("\n\n");
+                    }
+
+                    TextView tvSonuc = getView().findViewById(R.id.tvSonuc);
+                    tvSonuc.setText(sb.toString());
+                });
+    }
+
+
 
 }

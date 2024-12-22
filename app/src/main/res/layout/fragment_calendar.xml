@@ -6,8 +6,6 @@
     android:orientation="vertical"
     android:padding="16dp">
 
-
-
     <!-- Takvim -->
     <CalendarView
         android:id="@+id/calendarView"
@@ -19,6 +17,17 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Etkinlik Ekle" />
+
+    <TextView
+        android:id="@+id/tvSonuc"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Etkinlikler burada görünecek"
+        android:textColor="@android:color/black"
+        android:textSize="16sp"
+        android:padding="8dp" />
+
 
 
 
