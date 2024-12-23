@@ -12,7 +12,7 @@
         android:id="@+id/teams"/>
 
 
-    <item android:title="Chats"
-         android:icon="@drawable/chat_line_svgrepo_com"
-        android:id="@+id/chats"  />
+    <item android:title="Profile"
+         android:icon="@drawable/account"
+        android:id="@+id/profile"  />
 </menu>

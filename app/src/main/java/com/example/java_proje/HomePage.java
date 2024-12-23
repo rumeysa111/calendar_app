@@ -33,7 +33,7 @@ public class HomePage extends AppCompatActivity {
                 replaceFragment(new CalendarFragment());
             } else if (itemId == R.id.teams) {
                 replaceFragment(new TeamsFragment());
-            } else if (itemId == R.id.chats) {
+            } else if (itemId == R.id.profile) {
                 replaceFragment(new ChatsFragment());
             }
             return true;
