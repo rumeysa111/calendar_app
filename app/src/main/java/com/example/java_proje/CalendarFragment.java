@@ -25,66 +25,106 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+
+
 public class CalendarFragment extends Fragment {
+
+    public interface TeamsCallback {
+        void onTeamsFetched(List<String> teams); // Takımlar başarıyla alındığında çağrılacak metot
+        void onError(String errorMessage); // Hata durumunda çağrılacak metot
+    }
 
     private Date selectedDate;
     private RecyclerView recyclerView;
     private EventAdapter eventAdapter;
     private List<Event> eventList = new ArrayList<>();
+    private FirebaseFirestore db;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_calendar, container, false);
 
-        // RecyclerView ayarları
-        recyclerView = view.findViewById(R.id.recyclerViewEvents);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        eventAdapter = new EventAdapter(eventList);
-        recyclerView.setAdapter(eventAdapter);
-
-        // Takvim
-        CalendarView calendarView = view.findViewById(R.id.calendarView);
-        calendarView.setOnDateChangeListener((view1, year, month, dayOfMonth) -> {
-            selectedDate = new Date(year - 1900, month, dayOfMonth); // Seçilen tarihi kaydet
-        });
-
-        // Etkinlik Ekle Butonu
-        Button addEventButton = view.findViewById(R.id.buttonAddEvent);
-        addEventButton.setOnClickListener(v -> {
-            if (selectedDate == null) {
-                selectedDate = new Date(); // Eğer tarih seçilmediyse bugünün tarihi
-            }
-
-            // EventDialogFragment ile seçilen tarih ve takımları gönder
-            EventDialogFragment dialogFragment = EventDialogFragment.newInstance(selectedDate, getTeams());
-            dialogFragment.show(getParentFragmentManager(), "EventDialogFragment");
-        });
-
-        // Etkinlikleri Firestore'dan getir
-        fetchEvents();
+        initializeFirestore();
+        setupRecyclerView(view);
+        setupCalendarView(view);
+        setupAddEventButton(view);
+        fetchEventsFromFirestore();
 
         return view;
     }
 
-    private List<String> getTeams() {
-        List<String> teams = new ArrayList<>();
-        teams.add("Yönetim Kurulu");
-        teams.add("Asistan");
-        teams.add("UI Ekibi");
-        return teams;
+    private void initializeFirestore() {
+        db = FirebaseFirestore.getInstance();
     }
 
+    private void setupRecyclerView(View view) {
+        recyclerView = view.findViewById(R.id.recyclerViewEvents);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        eventAdapter = new EventAdapter(eventList);
+        recyclerView.setAdapter(eventAdapter);
+    }
 
-    public void addEvent(String title, String description, String selectedTeam, Date selectedDate) {
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private void setupCalendarView(View view) {
+        CalendarView calendarView = view.findViewById(R.id.calendarView);
+        calendarView.setOnDateChangeListener((view1, year, month, dayOfMonth) -> {
+            selectedDate = new Date(year - 1900, month, dayOfMonth);
+        });
+    }
 
+    private void setupAddEventButton(View view) {
+        Button addEventButton = view.findViewById(R.id.buttonAddEvent);
+        addEventButton.setOnClickListener(v -> {
+            if (selectedDate == null) {
+                selectedDate = new Date();
+            }
+
+            fetchTeamsFromFirestore(new TeamsCallback() {
+                @Override
+                public void onTeamsFetched(List<String> teams) {
+                    EventDialogFragment dialogFragment = EventDialogFragment.newInstance(selectedDate, teams);
+                    dialogFragment.show(getParentFragmentManager(), "EventDialogFragment");
+                }
+
+                @Override
+                public void onError(String errorMessage) {
+                    showToast(errorMessage);
+                }
+            });
+        });
+    }
+
+    private void fetchTeamsFromFirestore(TeamsCallback callback) {
         SharedPreferences sharedPreferences = requireContext().getSharedPreferences("user_prefs", Context.MODE_PRIVATE);
         String adminId = sharedPreferences.getString("adminId", "unknownAdmin");
-        String teamId = "teamId_placeholder"; // Gerçek teamId'yi almanız gerekebilir.
+
+        db.collection("teams")
+                .whereEqualTo("adminId", adminId)
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    List<String> teams = new ArrayList<>();
+                    for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
+                        String teamName = document.getString("teamName");
+                        if (teamName != null) {
+                            teams.add(teamName);
+                        }
+                    }
+                    if (!teams.isEmpty()) {
+                        callback.onTeamsFetched(teams);
+                    } else {
+                        callback.onError("Takım bulunamadı!");
+                    }
+                })
+                .addOnFailureListener(e -> callback.onError("Takım bilgileri alınırken hata oluştu: " + e.getMessage()));
+    }
+
+    public void addEvent(String title, String description, String selectedTeam, Date selectedDate) {
+        SharedPreferences sharedPreferences = requireContext().getSharedPreferences("user_prefs", Context.MODE_PRIVATE);
+        String adminId = sharedPreferences.getString("adminId", "unknownAdmin");
+        String teamId = "teamId_placeholder"; // Gerçek teamId gerekli.
 
         Map<String, Object> event = new HashMap<>();
-        event.put("eventId", db.collection("events").document().getId()); // Otomatik ID
+        event.put("eventId", db.collection("events").document().getId());
         event.put("eventName", title);
         event.put("eventDescription", description);
         event.put("teamName", selectedTeam);
@@ -93,18 +133,11 @@ public class CalendarFragment extends Fragment {
         event.put("teamId", teamId);
 
         db.collection("events").add(event)
-                .addOnSuccessListener(documentReference -> {
-                    Toast.makeText(requireContext(), "Etkinlik başarıyla eklendi!", Toast.LENGTH_SHORT).show();
-                })
-                .addOnFailureListener(e -> {
-                    Toast.makeText(requireContext(), "Etkinlik eklenirken hata oluştu: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                });
+                .addOnSuccessListener(documentReference -> showToast("Etkinlik başarıyla eklendi!"))
+                .addOnFailureListener(e -> showToast("Etkinlik eklenirken hata oluştu: " + e.getMessage()));
     }
 
-
-    private void fetchEvents() {
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-
+    private void fetchEventsFromFirestore() {
         db.collection("events")
                 .get()
                 .addOnCompleteListener(task -> {
@@ -116,14 +149,17 @@ public class CalendarFragment extends Fragment {
                             Date date = document.getDate("selectedDate");
                             String teamName = document.getString("teamName");
 
-                            // Event modeline ekle
                             Event event = new Event(title, description, date, teamName);
                             eventList.add(event);
                         }
                         eventAdapter.notifyDataSetChanged();
                     } else {
-                        Toast.makeText(getContext(), "Veri alınırken hata oluştu!", Toast.LENGTH_SHORT).show();
+                        showToast("Veri alınırken hata oluştu!");
                     }
                 });
+    }
+
+    private void showToast(String message) {
+        Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
     }
 }
