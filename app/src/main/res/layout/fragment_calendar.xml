@@ -9,6 +9,7 @@
         android:orientation="vertical"
         android:padding="16dp">
 
+
         <!-- Takvim -->
         <CalendarView
             android:id="@+id/calendarView"

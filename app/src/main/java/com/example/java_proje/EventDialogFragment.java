@@ -53,10 +53,28 @@ public class EventDialogFragment extends DialogFragment {
         // Saat seçici butonu
         Button timeButton = view.findViewById(R.id.btn_select_time);
         timeButton.setOnClickListener(v -> {
+            // İlk önce geçerli saat ve dakikayı al
+            Calendar calendar = Calendar.getInstance();
+            int currentHour = calendar.get(Calendar.HOUR_OF_DAY);
+            int currentMinute = calendar.get(Calendar.MINUTE);
+
+            // TimePickerDialog oluştur
             TimePickerDialog timePicker = new TimePickerDialog(
                     requireContext(),
-                    (view1, hourOfDay, minute) -> timeButton.setText(String.format("Saat Seç: %02d:%02d", hourOfDay, minute)),
-                    19, 0, true
+                    (view1, hourOfDay, minute) -> {
+                        // Seçilen saat ve dakikayı takvime ayarla
+                        calendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
+                        calendar.set(Calendar.MINUTE, minute);
+                        calendar.set(Calendar.SECOND, 0);
+
+                        // Seçilen saati butona yaz
+                        String formattedTime = String.format("Saat Seç: %02d:%02d", hourOfDay, minute);
+                        timeButton.setText(formattedTime);
+
+                        // Seçilen saat ve dakikayı bir `Date` olarak kaydet
+                        getArguments().putSerializable("selected_time", calendar.getTime());
+                    },
+                    currentHour, currentMinute, true // 24 saat formatı
             );
             timePicker.show();
         });
@@ -80,13 +98,30 @@ public class EventDialogFragment extends DialogFragment {
             if (title.isEmpty() || description.isEmpty()) {
                 Toast.makeText(getContext(), "Tüm alanları doldurun!", Toast.LENGTH_SHORT).show();
             } else {
-                if (calendarFragment != null) {
-                    // Etkinliği CalendarFragment'e gönder
-                    calendarFragment.addEvent(title, description, selectedTeam, selectedDay);
+                // Tarih ve saat birleşimi
+                Calendar finalCalendar = Calendar.getInstance();
+                Date selectedDate = (Date) getArguments().getSerializable("selected_day"); // Seçilen tarih
+                Date selectedTime = (Date) getArguments().getSerializable("selected_time"); // Seçilen saat
+
+                if (selectedDate != null) {
+                    // Tarih bilgilerini ayarla
+                    finalCalendar.setTime(selectedDate);
+
+                    // Saat bilgilerini güncelle
+                    if (selectedTime != null) {
+                        Calendar timeCalendar = Calendar.getInstance();
+                        timeCalendar.setTime(selectedTime);
+
+                        finalCalendar.set(Calendar.HOUR_OF_DAY, timeCalendar.get(Calendar.HOUR_OF_DAY));
+                        finalCalendar.set(Calendar.MINUTE, timeCalendar.get(Calendar.MINUTE));
+                    }
                 }
 
-                // Firestore'a kaydet
-                saveEventToFirestore(title, description, selectedTeam, selectedDay);
+                // Son tam tarih ve saati al
+                Date finalDateTime = finalCalendar.getTime();
+
+                // Etkinliği kaydet
+                saveEventToFirestore(title, description, selectedTeam, finalDateTime);
                 dismiss(); // Dialog'u kapat
             }
         });

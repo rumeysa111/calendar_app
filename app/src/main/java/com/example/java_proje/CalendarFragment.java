@@ -75,6 +75,7 @@ public class CalendarFragment extends Fragment {
         return teams;
     }
 
+
     public void addEvent(String title, String description, String selectedTeam, Date selectedDate) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
