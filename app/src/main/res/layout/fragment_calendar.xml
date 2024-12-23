@@ -1,36 +1,35 @@
-<?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="16dp">
+    android:layout_height="match_parent">
 
-    <!-- Takvim -->
-    <CalendarView
-        android:id="@+id/calendarView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-
-    <Button
-        android:id="@+id/buttonAddEvent"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Etkinlik Ekle" />
-
-    <TextView
-        android:id="@+id/tvSonuc"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:text="Etkinlikler burada görünecek"
-        android:textColor="@android:color/black"
-        android:textSize="16sp"
-        android:padding="8dp" />
+        android:orientation="vertical"
+        android:padding="16dp">
 
+        <!-- Takvim -->
+        <CalendarView
+            android:id="@+id/calendarView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
 
+        <!-- Etkinlik Ekle Butonu -->
+        <Button
+            android:id="@+id/buttonAddEvent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Etkinlik Ekle"
+            android:layout_marginTop="16dp" />
 
+        <!-- RecyclerView -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerViewEvents"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:scrollbars="vertical" />
 
-
-
-</LinearLayout>
+    </LinearLayout>
+</ScrollView>

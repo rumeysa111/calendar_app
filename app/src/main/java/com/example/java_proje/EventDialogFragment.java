@@ -61,21 +61,6 @@ public class EventDialogFragment extends DialogFragment {
             timePicker.show();
         });
 
-        /*// Takvim seçici butonu
-        Button dateButton = view.findViewById(R.id.btn_select_date);
-        dateButton.setOnClickListener(v -> {
-            Calendar calendar = Calendar.getInstance();
-            int year = calendar.get(Calendar.YEAR);
-            int month = calendar.get(Calendar.MONTH);
-            int day = calendar.get(Calendar.DAY_OF_MONTH);
-
-            DatePickerDialog datePickerDialog = new DatePickerDialog(requireContext(),
-                    (view1, selectedYear, selectedMonth, selectedDayOfMonth) -> {
-                        // Seçilen tarihi güncelle
-                        selectedDateTextView.setText("Tarih: " + selectedDayOfMonth + "/" + (selectedMonth + 1) + "/" + selectedYear);
-                    }, year, month, day);
-            datePickerDialog.show();
-        });*/
 
         // Spinner'ı takımlar için doldur
         Spinner teamSpinner = view.findViewById(R.id.sp_team_selection);

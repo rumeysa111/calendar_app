@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+    <androidx.cardview.widget.CardView
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp"
+        app:cardCornerRadius="8dp"
+        app:cardElevation="4dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <TextView
+                android:id="@+id/tvEventTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Başlık"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvEventDescription"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Açıklama"
+                android:textSize="14sp"
+                android:layout_marginTop="4dp" />
+
+            <TextView
+                android:id="@+id/tvEventDate"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Tarih"
+                android:textSize="14sp"
+                android:layout_marginTop="4dp"
+                android:textColor="@android:color/darker_gray"/>
+
+            <TextView
+                android:id="@+id/tvEventTeam"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Takım"
+                android:textSize="14sp"
+                android:layout_marginTop="4dp"
+                android:textColor="@android:color/holo_blue_dark" />
+
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+
+
