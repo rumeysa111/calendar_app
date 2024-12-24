@@ -64,12 +64,14 @@ public class LoginScreen extends AppCompatActivity {
                         // Admin kullanıcı bulundu
                         DocumentSnapshot document = queryDocumentSnapshots.getDocuments().get(0);
                         String adminId = document.getId();
+                        String adminName=document.getString("username");
 
                         // Admin id'sini SharedPreferences'e kaydet
                         SharedPreferences sharedPreferences = getSharedPreferences("user_prefs", MODE_PRIVATE);
                         SharedPreferences.Editor editor = sharedPreferences.edit();
                         editor.putString("adminId", adminId);
                         editor.putString("role", "admin");
+                        editor.putString("username", adminName);
                         editor.apply();
 
                         // Başarı mesajı
@@ -90,6 +92,7 @@ public class LoginScreen extends AppCompatActivity {
                                         // User bulundu
                                         DocumentSnapshot document = queryDocumentSnapshots1.getDocuments().get(0);
                                         String userId = document.getId();
+                                        String userName=document.getString("username");
                                         boolean canAddUser = document.getBoolean("canAddUser");
                                         boolean canCreateMeeting = document.getBoolean("canCreateMeeting");
 
@@ -98,6 +101,7 @@ public class LoginScreen extends AppCompatActivity {
                                         SharedPreferences.Editor editor = sharedPreferences.edit();
                                         editor.putString("userId", userId);
                                         editor.putString("role", "user");
+                                        editor.putString("username", username);
                                         editor.putBoolean("canAddUser", canAddUser);
                                         editor.putBoolean("canCreateMeeting", canCreateMeeting);
 

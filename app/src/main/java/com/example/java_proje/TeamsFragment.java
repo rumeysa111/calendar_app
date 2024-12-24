@@ -1,8 +1,10 @@
 package com.example.java_proje;
 
 import android.app.Dialog;
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,6 +20,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.firestore.SetOptions;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -222,25 +225,48 @@ public class TeamsFragment extends Fragment {
     }
 
     // Add user to team in Firestore
-    private void addUserToTeam(String teamId, String username, String password, String role,boolean canCreateMeeting,boolean canAddUser) {
-        SharedPreferences sharedPreferences = getContext().getSharedPreferences("user_prefs", getContext().MODE_PRIVATE);
+    private void addUserToTeam(String teamId, String username, String password, String role, boolean canCreateMeeting, boolean canAddUser) {
+        SharedPreferences sharedPreferences = requireContext().getSharedPreferences("user_prefs", Context.MODE_PRIVATE);
         String adminId = sharedPreferences.getString("adminId", null);
 
+        // Kullanıcı verisi oluşturuluyor
         Map<String, Object> user = new HashMap<>();
         user.put("username", username);
         user.put("password", password);
         user.put("role", role);
         user.put("teamId", teamId);
-        user.put("adminId",adminId);
-        user.put("canCreateMeeting", canCreateMeeting); // Add the permission
-        user.put("canAddUser",canAddUser);
+        user.put("adminId", adminId);
+        user.put("canCreateMeeting", canCreateMeeting);
+        user.put("canAddUser", canAddUser);
 
+        // Kullanıcıyı Firestore'a ekle
         db.collection("users").add(user)
                 .addOnSuccessListener(documentReference -> {
-                    Toast.makeText(getContext(), "Kullanıcı eklendi: " + documentReference.getId(), Toast.LENGTH_SHORT).show();
+                    String generatedUserId = documentReference.getId(); // Firestore tarafından oluşturulan document ID
+
+                    // `userId` alanını kullanıcıya ekle
+                    documentReference.update("userId", generatedUserId)
+                            .addOnSuccessListener(aVoid -> {
+                                // Firestore'da userId ile ayrı bir giriş oluştur
+                                user.put("userId", generatedUserId);
+
+                                db.collection("users").document(generatedUserId).set(user, SetOptions.merge())
+                                        .addOnSuccessListener(unused -> {
+                                            Toast.makeText(requireContext(), "Kullanıcı ve ID başarıyla kaydedildi.", Toast.LENGTH_SHORT).show();
+                                        })
+                                        .addOnFailureListener(e -> {
+                                            Log.e("Firestore Error", "userId tekrar kaydedilemedi: " + e.getMessage());
+                                            Toast.makeText(requireContext(), "Kullanıcı ID'si kaydedilemedi.", Toast.LENGTH_SHORT).show();
+                                        });
+                            })
+                            .addOnFailureListener(e -> {
+                                Log.e("Firestore Error", "userId güncellenemedi: " + e.getMessage());
+                                Toast.makeText(requireContext(), "Kullanıcı ID'si güncellenemedi.", Toast.LENGTH_SHORT).show();
+                            });
                 })
                 .addOnFailureListener(e -> {
-                    Toast.makeText(getContext(), "Kullanıcı eklenemedi: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    Log.e("Firestore Error", "Kullanıcı eklenemedi: " + e.getMessage());
+                    Toast.makeText(requireContext(), "Kullanıcı eklenemedi: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                 });
     }
 

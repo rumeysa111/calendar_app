@@ -1,5 +1,9 @@
 package com.example.java_proje;
 
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -7,36 +11,26 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.TextView;
+import android.widget.Toast;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link ChatsFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
+import com.google.firebase.firestore.FirebaseFirestore;
+
 public class ChatsFragment extends Fragment {
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
 
-    // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
 
     public ChatsFragment() {
-        // Required empty public constructor
+        // Gerekli varsayılan yapıcı
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment ChatsFragment.
-     */
-    // TODO: Rename and change types and number of parameters
     public static ChatsFragment newInstance(String param1, String param2) {
         ChatsFragment fragment = new ChatsFragment();
         Bundle args = new Bundle();
@@ -58,7 +52,91 @@ public class ChatsFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_chats, container, false);
+        View view = inflater.inflate(R.layout.fragment_chats, container, false);
+
+        ImageView profileAvatar = view.findViewById(R.id.profile_avatar);
+        TextView username = view.findViewById(R.id.username);
+        Button changePasswordButton = view.findViewById(R.id.change_password_button);
+        Button logoutButton = view.findViewById(R.id.logout_button);
+
+        SharedPreferences sharedPreferences = requireActivity().getSharedPreferences("user_prefs", Context.MODE_PRIVATE);
+        String name = sharedPreferences.getString("username", "");
+        String userId = sharedPreferences.getString("userId", "");
+
+        username.setText("Kullanıcı Adı: " + name);
+
+        changePasswordButton.setOnClickListener(v -> showChangePasswordDialog(userId));
+        logoutButton.setOnClickListener(v -> {
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.clear();
+            editor.apply();
+
+            Intent intent = new Intent(requireActivity(), LoginScreen.class);
+            startActivity(intent);
+            requireActivity().finish();
+
+            Toast.makeText(requireActivity(), "Başarıyla çıkış yapıldı.", Toast.LENGTH_SHORT).show();
+        });
+        return view;
+    }
+
+    private void showChangePasswordDialog(String userId) {
+        View dialogView = LayoutInflater.from(requireActivity()).inflate(R.layout.dialog_change_password, null);
+
+        EditText oldPasswordInput = dialogView.findViewById(R.id.old_password);
+        EditText newPasswordInput = dialogView.findViewById(R.id.new_password);
+        EditText newPasswordInput2 = dialogView.findViewById(R.id.new_password_again);
+        Button submitButton = dialogView.findViewById(R.id.submit_button);
+
+        SharedPreferences sharedPreferences = requireActivity().getSharedPreferences("user_prefs", Context.MODE_PRIVATE);
+
+        AlertDialog dialog = new AlertDialog.Builder(requireActivity())
+                .setView(dialogView)
+                .setCancelable(true)
+                .create();
+
+
+
+        submitButton.setOnClickListener(v -> {
+            String oldPassword = oldPasswordInput.getText().toString().trim();
+            String newPassword = newPasswordInput.getText().toString().trim();
+            String newPassword2 = newPasswordInput2.getText().toString().trim();
+
+            if (oldPassword.isEmpty() || newPassword.isEmpty() || newPassword2.isEmpty()) {
+                Toast.makeText(requireActivity(), "Lütfen tüm alanları doldurun.", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            if (!newPassword.equals(newPassword2)) {
+                Toast.makeText(requireActivity(), "Yeni şifreler eşleşmiyor.", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            FirebaseFirestore db = FirebaseFirestore.getInstance();
+            db.collection("users").document(userId).get().addOnSuccessListener(documentSnapshot -> {
+                if (documentSnapshot.exists()) {
+                    String storedPassword = documentSnapshot.getString("password");
+                    if (storedPassword != null && storedPassword.equals(oldPassword)) {
+                        db.collection("users").document(userId)
+                                .update("password", newPassword)
+                                .addOnSuccessListener(aVoid -> {
+                                    Toast.makeText(requireActivity(), "Şifre başarıyla güncellendi.", Toast.LENGTH_SHORT).show();
+                                    dialog.dismiss();
+                                })
+                                .addOnFailureListener(e -> {
+                                    Toast.makeText(requireActivity(), "Şifre güncellenirken hata oluştu.", Toast.LENGTH_SHORT).show();
+                                });
+                    } else {
+                        Toast.makeText(requireActivity(), "Eski şifre hatalı.", Toast.LENGTH_SHORT).show();
+                    }
+                } else {
+                    Toast.makeText(requireActivity(), "Kullanıcı bilgileri bulunamadı.", Toast.LENGTH_SHORT).show();
+                }
+            }).addOnFailureListener(e -> {
+                Toast.makeText(requireActivity(), "Hata oluştu, lütfen tekrar deneyin.", Toast.LENGTH_SHORT).show();
+            });
+        });
+
+        dialog.show();
     }
 }
