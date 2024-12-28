@@ -3,9 +3,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ProfileFragment">
+    tools:context=".ChatsFragment">
 
     <LinearLayout
+        android:id="@+id/root_layout"
         android:layout_width="match_parent"
         android:layout_height="774dp"
         android:gravity="center_horizontal"
@@ -27,21 +28,43 @@
             android:layout_height="wrap_content"
             android:text="Kullanıcı Adı" />
 
+
+        <Switch
+            android:id="@+id/theme_switch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="26dp"
+            android:text="Koyu Tema" />
+
+
         <!-- Şifre Değiştir Butonu -->
+
+
         <Button
             android:id="@+id/change_password_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="86dp"
+            android:backgroundTint="@android:color/holo_purple"
             android:text="Şifre Değiştir" />
+
+        <Button
+            android:id="@+id/send_feedback"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="Geri Bildirim Gönder" />
+
+
+        <!-- Çıkış Yap Butonu -->
         <Button
             android:id="@+id/logout_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Çıkış Yap"
             android:layout_marginTop="16dp"
             android:backgroundTint="@color/design_default_color_primary"
+            android:text="Çıkış Yap"
             android:textColor="@android:color/white" />
 
 
