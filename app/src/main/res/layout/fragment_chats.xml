@@ -1,73 +1,97 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/background_color"
     tools:context=".ChatsFragment">
 
     <LinearLayout
-        android:id="@+id/root_layout"
         android:layout_width="match_parent"
-        android:layout_height="774dp"
+        android:layout_height="wrap_content"
         android:gravity="center_horizontal"
         android:orientation="vertical"
-        android:padding="16dp">
+        android:padding="24dp"
+        android:layout_gravity="center">
 
-        <!-- Profil Avatarı -->
-        <ImageView
-            android:id="@+id/profile_avatar"
-            android:layout_width="100dp"
-            android:layout_height="100dp"
-            android:layout_marginBottom="16dp"
-            android:src="@drawable/user__3_" />
-
-        <!-- Kullanıcı Adı -->
-        <TextView
-            android:id="@+id/username"
-            android:layout_width="wrap_content"
+        <!-- Profil Kartı -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Kullanıcı Adı" />
+            android:layout_marginBottom="16dp"
+            app:cardElevation="4dp"
+            app:cardCornerRadius="12dp"
+            app:cardBackgroundColor="@color/background_color">
 
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp"
+                android:gravity="center_horizontal">
 
+                <!-- Profil Avatarı -->
+                <ImageView
+                    android:id="@+id/profile_avatar"
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
+                    android:layout_marginBottom="8dp"
+                    android:src="@drawable/user__3_"
+                    android:contentDescription="Profil Avatarı" />
+
+                <!-- Kullanıcı Adı -->
+                <TextView
+                    android:id="@+id/username"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Kullanıcı Adı"
+                    android:textSize="18sp"
+                    android:textColor="@color/black"
+                    android:fontFamily="sans-serif-medium" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Tema Değiştirici -->
         <Switch
             android:id="@+id/theme_switch"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="26dp"
-            android:text="Koyu Tema" />
-
+            android:text="Koyu Tema"
+            android:textSize="16sp"
+            android:layout_marginBottom="16dp" />
 
         <!-- Şifre Değiştir Butonu -->
-
-
-        <Button
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/change_password_button"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginTop="86dp"
-            android:backgroundTint="@android:color/holo_purple"
-            android:text="Şifre Değiştir" />
+            android:layout_marginBottom="12dp"
+            android:text="Şifre Değiştir"
+            app:backgroundTint="@color/purple"
+            app:cornerRadius="8dp"
+            android:textColor="@android:color/white" />
 
-        <Button
+        <!-- Geri Bildirim Gönder Butonu -->
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/send_feedback"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:text="Geri Bildirim Gönder" />
-
+            android:layout_marginBottom="12dp"
+            android:text="Geri Bildirim Gönder"
+            app:backgroundTint="@color/purple"
+            app:cornerRadius="8dp"
+            android:textColor="@android:color/white" />
 
         <!-- Çıkış Yap Butonu -->
-        <Button
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/logout_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:backgroundTint="@color/design_default_color_primary"
             android:text="Çıkış Yap"
+            app:backgroundTint="@color/purple"
+            app:cornerRadius="8dp"
             android:textColor="@android:color/white" />
 
-
     </LinearLayout>
-
 </FrameLayout>

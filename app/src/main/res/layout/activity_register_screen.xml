@@ -70,7 +70,8 @@
         android:clickable="true"
         android:focusable="true"
         android:text="Giriş Yap"
-        android:textColor="@color/button_background"
+        android:textColor="#2196F3"
+
         android:textSize="14sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.523"
