@@ -15,13 +15,38 @@
         android:orientation="vertical"
         android:padding="16dp">
 
-        <TextView
-            android:id="@+id/tvEventTitle"
+        <!-- Başlık ve İkonlar Aynı Satırda -->
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Başlık"
-            android:textSize="18sp"
-            android:textStyle="bold" />
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <TextView
+                android:id="@+id/tvEventTitle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Başlık"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <ImageView
+                android:id="@+id/ivEditEvent"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@android:drawable/ic_menu_edit"
+                android:layout_marginEnd="8dp"
+                android:contentDescription="Edit Event" />
+
+            <ImageView
+                android:id="@+id/ivDeleteEvent"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@android:drawable/ic_delete"
+                android:contentDescription="Delete Event" />
+
+        </LinearLayout>
 
         <TextView
             android:id="@+id/tvEventDescription"
@@ -49,22 +74,5 @@
             android:layout_marginTop="4dp"
             android:textColor="@android:color/holo_blue_dark" />
 
-        <ImageView
-            android:id="@+id/ivEditEvent"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:src="@android:drawable/ic_menu_edit"
-            android:layout_marginEnd="16dp"
-            android:contentDescription="Edit Event" />
-
-        <ImageView
-            android:id="@+id/ivDeleteEvent"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:src="@android:drawable/ic_delete"
-            android:contentDescription="Delete Event" />
-
     </LinearLayout>
 </androidx.cardview.widget.CardView>
-
-
