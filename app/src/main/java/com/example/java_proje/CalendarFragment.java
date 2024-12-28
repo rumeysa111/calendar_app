@@ -50,8 +50,19 @@ public class CalendarFragment extends Fragment implements EventAdapter.OnEventAc
         setupAddEventButton(view);
         fetchEventsFromFirestore();
 
+        // Kullanıcının rolünü kontrol et ve butonu görünür/görünmez yap
+        SharedPreferences sharedPreferences = requireContext().getSharedPreferences("user_prefs", Context.MODE_PRIVATE);
+        String userRole = sharedPreferences.getString("role", "user"); // Varsayılan olarak "user"
+        Button addEventButton = view.findViewById(R.id.buttonAddEvent);
+        if ("admin".equals(userRole)) {
+            addEventButton.setVisibility(View.VISIBLE);
+        } else {
+            addEventButton.setVisibility(View.GONE);
+        }
+
         return view;
     }
+
 
     private void initializeFirestore() {
         db = FirebaseFirestore.getInstance();

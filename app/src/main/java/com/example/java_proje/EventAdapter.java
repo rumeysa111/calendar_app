@@ -1,5 +1,7 @@
 package com.example.java_proje;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -42,20 +44,33 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
         holder.tvEventDate.setText(event.getDate().toString());
         holder.tvEventTeam.setText(event.getTeamName());
 
-        // Edit tıklama işleyicisi
+        // Admin kontrolü
+        SharedPreferences sharedPreferences = holder.itemView.getContext().getSharedPreferences("user_prefs", Context.MODE_PRIVATE);
+        String userRole = sharedPreferences.getString("role", "user");
+
+        if ("admin".equals(userRole)) {
+            holder.ivEditEvent.setVisibility(View.VISIBLE);
+            holder.ivDeleteEvent.setVisibility(View.VISIBLE);
+        } else {
+            holder.ivEditEvent.setVisibility(View.GONE);
+            holder.ivDeleteEvent.setVisibility(View.GONE);
+        }
+
+        // Düzenle ve silme işlemleri için listener'ları ayarla
         holder.ivEditEvent.setOnClickListener(v -> {
             if (listener != null) {
                 listener.onEditEvent(event);
             }
         });
 
-        // Delete tıklama işleyicisi
         holder.ivDeleteEvent.setOnClickListener(v -> {
             if (listener != null) {
                 listener.onDeleteEvent(event);
             }
         });
     }
+
+
 
     @Override
     public int getItemCount() {
