@@ -20,14 +20,13 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-
-
-public class CalendarFragment extends Fragment {
+public class CalendarFragment extends Fragment implements EventAdapter.OnEventActionListener {
 
     public interface TeamsCallback {
         void onTeamsFetched(List<String> teams); // Takımlar başarıyla alındığında çağrılacak metot
@@ -61,9 +60,50 @@ public class CalendarFragment extends Fragment {
     private void setupRecyclerView(View view) {
         recyclerView = view.findViewById(R.id.recyclerViewEvents);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        eventAdapter = new EventAdapter(eventList);
+        eventAdapter = new EventAdapter(eventList, this); // "this" artık OnEventActionListener'ı temsil eder
         recyclerView.setAdapter(eventAdapter);
     }
+
+    @Override
+    public void onEditEvent(Event event) {
+        EventDialogFragment dialogFragment = EventDialogFragment.newInstance(
+                event.getEventId(),      // Mevcut etkinlik ID'si
+                event.getDate(),         // Mevcut tarih
+                event.getTitle(),        // Mevcut başlık
+                event.getDescription(),  // Mevcut açıklama
+                Arrays.asList(event.getTeamName()) // Mevcut takım
+        );
+        dialogFragment.show(getParentFragmentManager(), "EditEventDialog");
+    }
+
+
+
+    @Override
+    public void onDeleteEvent(Event event) {
+        // Delete işlemi
+        db.collection("events").document(event.getEventId())
+                .delete()
+                .addOnSuccessListener(aVoid -> showToast("Etkinlik başarıyla silindi!"))
+                .addOnFailureListener(e -> showToast("Etkinlik silinirken hata oluştu: " + e.getMessage()));
+    }
+    private void updateEventInFirestore(String eventId, String title, String description, Date date, String teamName) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+        Map<String, Object> updatedEvent = new HashMap<>();
+        updatedEvent.put("eventName", title);
+        updatedEvent.put("eventDescription", description);
+        updatedEvent.put("selectedDate", date);
+        updatedEvent.put("teamName", teamName);
+
+        db.collection("events").document(eventId)
+                .update(updatedEvent)
+                .addOnSuccessListener(aVoid -> {
+                    Toast.makeText(getContext(), "Etkinlik başarıyla güncellendi!", Toast.LENGTH_SHORT).show();
+
+                })
+                .addOnFailureListener(e -> Toast.makeText(getContext(), "Etkinlik güncellenirken hata oluştu: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+    }
+
 
     private void setupCalendarView(View view) {
         CalendarView calendarView = view.findViewById(R.id.calendarView);
@@ -82,7 +122,14 @@ public class CalendarFragment extends Fragment {
             fetchTeamsFromFirestore(new TeamsCallback() {
                 @Override
                 public void onTeamsFetched(List<String> teams) {
-                    EventDialogFragment dialogFragment = EventDialogFragment.newInstance(selectedDate, teams);
+                    // Yeni etkinlik eklemek için null parametrelerle çağrı yapılır
+                    EventDialogFragment dialogFragment = EventDialogFragment.newInstance(
+                            null,         // eventId yok
+                            selectedDate, // Seçilen tarih
+                            "",           // Boş başlık
+                            "",           // Boş açıklama
+                            teams         // Mevcut takımlar
+                    );
                     dialogFragment.show(getParentFragmentManager(), "EventDialogFragment");
                 }
 
@@ -144,12 +191,13 @@ public class CalendarFragment extends Fragment {
                     if (task.isSuccessful()) {
                         eventList.clear();
                         for (QueryDocumentSnapshot document : task.getResult()) {
+                            String eventId = document.getId(); // Firestore'dan document ID'yi alın
                             String title = document.getString("eventName");
                             String description = document.getString("eventDescription");
                             Date date = document.getDate("selectedDate");
                             String teamName = document.getString("teamName");
 
-                            Event event = new Event(title, description, date, teamName);
+                            Event event = new Event(eventId, title, description, date, teamName);
                             eventList.add(event);
                         }
                         eventAdapter.notifyDataSetChanged();

@@ -38,7 +38,7 @@
             android:text="Tarih"
             android:textSize="14sp"
             android:layout_marginTop="4dp"
-            android:textColor="@android:color/holo_green_dark"/>
+            android:textColor="@android:color/holo_purple"/>
 
         <TextView
             android:id="@+id/tvEventTeam"
@@ -48,6 +48,21 @@
             android:textSize="14sp"
             android:layout_marginTop="4dp"
             android:textColor="@android:color/holo_blue_dark" />
+
+        <ImageView
+            android:id="@+id/ivEditEvent"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@android:drawable/ic_menu_edit"
+            android:layout_marginEnd="16dp"
+            android:contentDescription="Edit Event" />
+
+        <ImageView
+            android:id="@+id/ivDeleteEvent"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@android:drawable/ic_delete"
+            android:contentDescription="Delete Event" />
 
     </LinearLayout>
 </androidx.cardview.widget.CardView>

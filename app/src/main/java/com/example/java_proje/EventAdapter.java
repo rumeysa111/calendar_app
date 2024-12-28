@@ -3,6 +3,7 @@ package com.example.java_proje;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -13,9 +14,16 @@ import java.util.List;
 public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHolder> {
 
     private List<Event> eventList;
+    private OnEventActionListener listener;
 
-    public EventAdapter(List<Event> eventList) {
+    public EventAdapter(List<Event> eventList, OnEventActionListener listener) {
         this.eventList = eventList;
+        this.listener = listener;
+    }
+
+    public interface OnEventActionListener {
+        void onEditEvent(Event event);
+        void onDeleteEvent(Event event);
     }
 
     @NonNull
@@ -28,10 +36,25 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
     @Override
     public void onBindViewHolder(@NonNull EventViewHolder holder, int position) {
         Event event = eventList.get(position);
+
         holder.tvEventTitle.setText(event.getTitle());
         holder.tvEventDescription.setText(event.getDescription());
         holder.tvEventDate.setText(event.getDate().toString());
         holder.tvEventTeam.setText(event.getTeamName());
+
+        // Edit tıklama işleyicisi
+        holder.ivEditEvent.setOnClickListener(v -> {
+            if (listener != null) {
+                listener.onEditEvent(event);
+            }
+        });
+
+        // Delete tıklama işleyicisi
+        holder.ivDeleteEvent.setOnClickListener(v -> {
+            if (listener != null) {
+                listener.onDeleteEvent(event);
+            }
+        });
     }
 
     @Override
@@ -41,6 +64,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
 
     static class EventViewHolder extends RecyclerView.ViewHolder {
         TextView tvEventTitle, tvEventDescription, tvEventDate, tvEventTeam;
+        ImageView ivEditEvent, ivDeleteEvent;
 
         public EventViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -48,6 +72,8 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
             tvEventDescription = itemView.findViewById(R.id.tvEventDescription);
             tvEventDate = itemView.findViewById(R.id.tvEventDate);
             tvEventTeam = itemView.findViewById(R.id.tvEventTeam);
+            ivEditEvent = itemView.findViewById(R.id.ivEditEvent);
+            ivDeleteEvent = itemView.findViewById(R.id.ivDeleteEvent);
         }
     }
 }
